@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="shortcut icon" href="#">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+        integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="player">
+        <div class="dashboard">
+            <header>
+                <h4>Now playing</h4>
+                <h2>taeyeon</h2>
+            </header>
+            <div class="cd">
+                <div class="cd-thumb"
+                    style="background-image: url('https://photo-resize-zmp3.zadn.vn/w320_r1x1_webp/cover/3/4/f/d/34fda0a095325b1464fe33f24e416055.jpg');">
+                </div>
+            </div>
+            <div class="control">
+                <div class="btn btn-repeat">
+                    <i class="fa fa-redo"></i>
+                </div>
+                <div class="btn btn-prev">
+                    <i class="fa fa-step-backward"></i>
+                </div>
+                <div class="btn btn-toggle-play">
+                    <i class="fa fa-pause icon-pause act"></i>
+                    <i class="fa fa-play icon-play "></i>
+                </div>
+                <div class="btn btn-next">
+                    <i class="fa fa-step-forward"></i>
+                </div>
+                <div class="btn btn-random">
+                    <i class="fa fa-random"></i>
+                </div>
+            </div>
+            <input id="progress" class="progress" type="range" value="0" step="1" mim="0" max="100">
+            <audio id="audio" src=""></audio>
+
+        </div>
+
+        <div class="playlist">
+
+        </div>
+
+    </div>
+
+    <script>
+        const $ = document.querySelector.bind(document)
+        const $$ = document.querySelectorAll.bind(document)
+        const PLAY_SETTING_KEY = "SETTING_PLAYER"
+        const playlist = $('.playlist')
+        const header = $('header h2')
+        const cdThumb = $('.cd-thumb')
+        const audio = $('#audio')
+        const playBtn = $('.btn-toggle-play')
+        const progress = $('#progress')
+        const nextBtn = $('.btn-next')
+        const prevBtn = $('.btn-prev')
+        const randomBtn = $('.btn-random')
+        const repeatBtn = $('.btn-repeat')
+
+
+
+
+
+        const app = {
+            currentIndex: 0,
+            playings: false,
+            random: false,
+            repeat: false,
+            setting: JSON.parse(localStorage.getItem(PLAY_SETTING_KEY))||{
+                random: false,
+                repeat: false,
+            },
+            songs: [
+                {
+                    name: "Can't Control Myself",
+                    singer: 'TAEYEON',
+                    path: "./assets/music/Can'tControlMyself-TAEYEON.mp3",
+                    image: 'https://photo-resize-zmp3.zadn.vn/w320_r1x1_webp/cover/3/4/f/d/34fda0a095325b1464fe33f24e416055.jpg'
+                },
+                {
+                    name: 'Step Back',
+                    singer: 'GOT the beat',
+                    path: './assets/music/StepBack-GOTthebeat.mp3',
+                    image: 'https://photo-resize-zmp3.zadn.vn/w480_r1x1_webp/cover/3/5/c/a/35ca3fb4b802521f33878f4f076d78e3.jpg'
+                },
+                {
+                    name: "Can't Control Myself",
+                    singer: 'TAEYEON',
+                    path: "./assets/music/Can'tControlMyself-TAEYEON.mp3",
+                    image: 'https://photo-resize-zmp3.zadn.vn/w320_r1x1_webp/cover/3/4/f/d/34fda0a095325b1464fe33f24e416055.jpg'
+                },
+                {
+                    name: 'Step Back',
+                    singer: 'GOT the beat',
+                    path: './assets/music/StepBack-GOTthebeat.mp3',
+                    image: 'https://photo-resize-zmp3.zadn.vn/w480_r1x1_webp/cover/3/5/c/a/35ca3fb4b802521f33878f4f076d78e3.jpg'
+                },
+                {
+                    name: "Can't Control Myself",
+                    singer: 'TAEYEON',
+                    path: "./assets/music/Can'tControlMyself-TAEYEON.mp3",
+                    image: 'https://photo-resize-zmp3.zadn.vn/w320_r1x1_webp/cover/3/4/f/d/34fda0a095325b1464fe33f24e416055.jpg'
+                },
+                {
+                    name: 'Step Back',
+                    singer: 'GOT the beat',
+                    path: './assets/music/StepBack-GOTthebeat.mp3',
+                    image: 'https://photo-resize-zmp3.zadn.vn/w480_r1x1_webp/cover/3/5/c/a/35ca3fb4b802521f33878f4f076d78e3.jpg'
+                },
+                {
+                    name: "Can't Control Myself",
+                    singer: 'TAEYEON',
+                    path: "./assets/music/Can'tControlMyself-TAEYEON.mp3",
+                    image: 'https://photo-resize-zmp3.zadn.vn/w320_r1x1_webp/cover/3/4/f/d/34fda0a095325b1464fe33f24e416055.jpg'
+                },
+                {
+                    name: 'Step Back',
+                    singer: 'GOT the beat',
+                    path: './assets/music/StepBack-GOTthebeat.mp3',
+                    image: 'https://photo-resize-zmp3.zadn.vn/w240_r1x1_webp/avatars/b/3/7/5/b375ceb32e4b74a1c84fd4cb8ad458f4.jpg'
+                }
+            ],
+            setSetting:function(key,value){
+                this.setting[key] = value
+                localStorage.setItem(PLAY_SETTING_KEY,JSON.stringify(this.setting))
+            },
+            render: function () {
+                const htmls = this.songs.map((song, index) => {
+                    return `
+                        <div class="song ${index===this.currentIndex?'activeSong':''}" data-index=${index}>
+                            <div class="thumb"
+                                style="background-image: url('${song.image}');">
+                            </div>
+                            <div class="body">
+                                <h3 class="title">${song.name}</h3>
+                                <h3 class="author">${song.singer}</h3>
+                            </div>
+                            <div class="option">
+                                <i class="fa fa-ellipsis-h"></i>
+                            </div>
+                        </div>`
+                })
+                playlist.innerHTML = htmls.join('')
+            },
+            loadSettings:function(){
+                this.random = this.setting.random
+                this.repeat = this.setting.repeat
+            },
+            loadCurrentSong: function () {
+                header.textContent = this.songs[this.currentIndex].name
+                cdThumb.style.backgroundImage = `url('${this.songs[this.currentIndex].image}')`
+                audio.src = this.songs[this.currentIndex].path
+            },
+            nextSong: function () {
+                this.currentIndex++
+                if (this.currentIndex >= this.songs.length) {
+                    this.currentIndex = 0
+                }
+                this.loadCurrentSong()
+            },
+            prevSong: function () {
+                this.currentIndex--
+                if (this.currentIndex < 0) {
+                    this.currentIndex = this.songs.length - 1
+                }
+                this.loadCurrentSong()
+            },
+            playRandomSong: function () {
+                let newCurrent
+                do {
+                    newCurrent = Math.floor(Math.random() * this.songs.length)
+                } while (newCurrent === this.currentIndex)
+                this.currentIndex = newCurrent
+                this.loadCurrentSong()
+            },
+            handleEvents: function () {
+                const cd = $('.cd')
+                const cdWidth = cd.offsetWidth;
+
+                document.onscroll = function () {
+                    const scrollY = window.scrollY || document.documentElement.scrollTop
+                    const newWidth = cdWidth - scrollY
+
+                    cd.style.width = newWidth > 0 ? newWidth + 'px' : 0
+                    cdThumb.style.paddingTop = newWidth > 0 ? newWidth + 'px' : 0
+                    cd.style.opacity = newWidth / cdWidth
+                }
+                const cdThumbAnimate = cdThumb.animate([
+                    { transform: 'rotate(360deg)' }
+                ], {
+                    duration: 10000,
+                    iterations: Infinity
+                })
+                cdThumbAnimate.pause()
+
+                playBtn.onclick = function () {
+                    if (app.playings) {
+                        audio.pause()
+                        $('.icon-play').classList.remove('act')
+                        $('.icon-pause').classList.add('act')
+                    } else {
+                        audio.play()
+                        $('.icon-pause').classList.remove('act')
+                        $('.icon-play').classList.add('act')
+                    }
+                }
+                // playBtn.addEventListener("click", function () {
+                //     if (app.playings) {
+                //         audio.pause()
+                //         $('.icon-play').classList.remove('act')
+                //         $('.icon-pause').classList.add('act')
+                //         app.playings = false
+                //     } else {
+                //         audio.play()
+                //         $('.icon-pause').classList.remove('act')
+                //         $('.icon-play').classList.add('act')
+                //         app.playings = true
+                //     }
+                // })
+                audio.onplay = function(){
+                    app.playings = true
+                    cdThumbAnimate.play()
+                }
+                audio.onpause = function(){
+                    app.playings = false
+                    cdThumbAnimate.pause()
+                }
+                audio.ontimeupdate = function () {
+                    if (audio.duration) {
+                        const progressPercent = Math.floor(audio.currentTime * 100 / audio.duration)
+                        progress.value = progressPercent
+                    }
+                }
+                progress.onchange = function (e) {
+                    const seekTime = e.target.value * audio.duration / 100
+                    audio.currentTime = seekTime
+                }
+                nextBtn.onclick = function () {
+                    if (app.random) {
+                        app.playRandomSong()
+                        if (app.playings) {
+                            audio.play()
+                        } else {
+                            audio.pause()
+                        }
+                    } else {
+                        app.nextSong()
+                        if (app.playings) {
+                            audio.play()
+                        } else {
+                            audio.pause()
+                        }
+                    }
+                    app.render()
+                }
+                prevBtn.onclick = function () {
+                    if (app.random) {
+                        app.playRandomSong()
+                        if (app.playings) {
+                            audio.play()
+                        } else {
+                            audio.pause()
+                        }
+                    } else {
+                        app.prevSong()
+                        if (app.playings) {
+                            audio.play()
+                        } else {
+                            audio.pause()
+                        }
+                    }
+                    app.render()
+                }
+                randomBtn.onclick = function () {
+                    if (app.random) {
+                        randomBtn.classList.remove('active')
+                        app.random = false
+                        app.setSetting('random',app.random)
+                    } else {
+                        randomBtn.classList.add('active')
+                        app.random = true
+                        app.setSetting('random',app.random)
+
+                    }
+                }
+                repeatBtn.onclick = function () {
+                    //c1
+                    app.repeat = !app.repeat
+                    app.setSetting('repeat',app.repeat)
+                    repeatBtn.classList.toggle('active', app.repeat)
+
+                    //c2
+                    // if(app.repeat){
+                    //     repeatBtn.classList.remove('active')
+                    //     app.repeat=false
+                    // }else{
+                    //     repeatBtn.classList.add('active')
+                    //     app.repeat=true
+                    // }
+                }
+                audio.onended= function (){
+                    if (app.repeat) {
+                        audio.play()
+                    }else if (app.repeat){
+                        app.playRandomSong()
+                    }else{
+                        app.nextSong()
+                    }
+                    audio.play()
+                    app.render()
+                }
+                playlist.onclick= function (e) {
+                    if(e.target.closest('.option')){
+                        
+                    }else{
+                        if (e.target.closest('.song:not(.activeSong)')) {
+                            $('.icon-pause').classList.remove('act')
+                            $('.icon-play').classList.add('act')
+                            app.currentIndex =Number(e.target.closest('.song:not(.activeSong)').dataset.index)
+                            app.loadCurrentSong()
+                            audio.play()
+                            app.render()
+                        }
+                    }
+                }
+            },
+
+            start: function () {
+                this.loadSettings()
+                this.handleEvents()
+                this.loadCurrentSong()
+
+                this.render()
+
+                repeatBtn.classList.toggle('active', this.repeat)
+                randomBtn.classList.toggle('active', this.random)
+            }
+        }
+        app.start()
+    </script>
+</body>
+
+</html>
