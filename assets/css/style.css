@@ -1,5 +1,8 @@
+html{
+    background-color: black;
+}
 body{
-    margin: 0;
+    margin: 0 auto;
     top: 0;
     left: 0;
     background-color: #ddd;
@@ -16,7 +19,6 @@ body{
     width: calc(100% - 20px);
     max-width: calc(450px - 20px);
     top: 0;
-    left: 0;
     text-align: center;
     background-color: #fff;
    

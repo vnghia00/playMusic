@@ -77,7 +77,7 @@
             playings: false,
             random: false,
             repeat: false,
-            setting: JSON.parse(localStorage.getItem(PLAY_SETTING_KEY))||{
+            setting: JSON.parse(localStorage.getItem(PLAY_SETTING_KEY)) || {
                 random: false,
                 repeat: false,
             },
@@ -129,16 +129,34 @@
                     singer: 'GOT the beat',
                     path: './assets/music/StepBack-GOTthebeat.mp3',
                     image: 'https://photo-resize-zmp3.zadn.vn/w240_r1x1_webp/avatars/b/3/7/5/b375ceb32e4b74a1c84fd4cb8ad458f4.jpg'
+                },
+                {
+                    name: 'Step Back',
+                    singer: 'GOT the beat',
+                    path: './assets/music/StepBack-GOTthebeat.mp3',
+                    image: 'https://photo-resize-zmp3.zadn.vn/w240_r1x1_webp/avatars/b/3/7/5/b375ceb32e4b74a1c84fd4cb8ad458f4.jpg'
+                },
+                {
+                    name: 'Step Back',
+                    singer: 'GOT the beat',
+                    path: './assets/music/StepBack-GOTthebeat.mp3',
+                    image: 'https://photo-resize-zmp3.zadn.vn/w240_r1x1_webp/avatars/b/3/7/5/b375ceb32e4b74a1c84fd4cb8ad458f4.jpg'
+                },
+                {
+                    name: 'Step Back',
+                    singer: 'GOT the beat',
+                    path: './assets/music/StepBack-GOTthebeat.mp3',
+                    image: 'https://photo-resize-zmp3.zadn.vn/w240_r1x1_webp/avatars/b/3/7/5/b375ceb32e4b74a1c84fd4cb8ad458f4.jpg'
                 }
             ],
-            setSetting:function(key,value){
+            setSetting: function (key, value) {
                 this.setting[key] = value
-                localStorage.setItem(PLAY_SETTING_KEY,JSON.stringify(this.setting))
+                localStorage.setItem(PLAY_SETTING_KEY, JSON.stringify(this.setting))
             },
             render: function () {
                 const htmls = this.songs.map((song, index) => {
                     return `
-                        <div class="song ${index===this.currentIndex?'activeSong':''}" data-index=${index}>
+                        <div class="song ${index === this.currentIndex ? 'activeSong' : ''}" data-index=${index}>
                             <div class="thumb"
                                 style="background-image: url('${song.image}');">
                             </div>
@@ -153,7 +171,7 @@
                 })
                 playlist.innerHTML = htmls.join('')
             },
-            loadSettings:function(){
+            loadSettings: function () {
                 this.random = this.setting.random
                 this.repeat = this.setting.repeat
             },
@@ -228,11 +246,11 @@
                 //         app.playings = true
                 //     }
                 // })
-                audio.onplay = function(){
+                audio.onplay = function () {
                     app.playings = true
                     cdThumbAnimate.play()
                 }
-                audio.onpause = function(){
+                audio.onpause = function () {
                     app.playings = false
                     cdThumbAnimate.pause()
                 }
@@ -286,18 +304,18 @@
                     if (app.random) {
                         randomBtn.classList.remove('active')
                         app.random = false
-                        app.setSetting('random',app.random)
+                        app.setSetting('random', app.random)
                     } else {
                         randomBtn.classList.add('active')
                         app.random = true
-                        app.setSetting('random',app.random)
+                        app.setSetting('random', app.random)
 
                     }
                 }
                 repeatBtn.onclick = function () {
                     //c1
                     app.repeat = !app.repeat
-                    app.setSetting('repeat',app.repeat)
+                    app.setSetting('repeat', app.repeat)
                     repeatBtn.classList.toggle('active', app.repeat)
 
                     //c2
@@ -309,25 +327,25 @@
                     //     app.repeat=true
                     // }
                 }
-                audio.onended= function (){
+                audio.onended = function () {
                     if (app.repeat) {
                         audio.play()
-                    }else if (app.repeat){
+                    } else if (app.repeat) {
                         app.playRandomSong()
-                    }else{
+                    } else {
                         app.nextSong()
                     }
                     audio.play()
                     app.render()
                 }
-                playlist.onclick= function (e) {
-                    if(e.target.closest('.option')){
-                        
-                    }else{
+                playlist.onclick = function (e) {
+                    if (e.target.closest('.option')) {
+
+                    } else {
                         if (e.target.closest('.song:not(.activeSong)')) {
                             $('.icon-pause').classList.remove('act')
                             $('.icon-play').classList.add('act')
-                            app.currentIndex =Number(e.target.closest('.song:not(.activeSong)').dataset.index)
+                            app.currentIndex = Number(e.target.closest('.song:not(.activeSong)').dataset.index)
                             app.loadCurrentSong()
                             audio.play()
                             app.render()
